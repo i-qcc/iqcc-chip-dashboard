@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.eggs/
+
+# uv
+# (uv.lock is committed)
+
+# Env / secrets
+.env
+*.env
+config.toml
+
+# Local state snapshots (fetched from cloud at runtime)
+data/
+*.local.json
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IQCC Chip State Dashboard</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body
+    data-rotation-seconds="{{ rotation_seconds }}"
+    data-refresh-interval-seconds="{{ refresh_interval_seconds }}"
+>
+    <header class="topbar">
+        <div class="brand" id="brand-name">Loading&hellip;</div>
+        <div class="topbar-right">
+            <div class="clock" id="clock"></div>
+            <div class="refresh-info" id="refresh-info">&mdash;</div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-overview" id="sidebar-overview"></div>
+        </aside>
+        <main class="main" id="main">
+            <div class="loading" id="loading">Connecting to IQCC cloud&hellip;</div>
+        </main>
+        <aside class="right-pane" id="right-pane">
+            <nav class="right-nav" id="right-nav"></nav>
+        </aside>
+    </div>
+
+    <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+
+    <script src="/static/dashboard.js"></script>
+</body>
+</html>

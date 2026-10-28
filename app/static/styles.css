@@ -1,0 +1,341 @@
+:root {
+    --accent: #ee2f66;
+    --bg: #c8e0f0;
+    --bg-topbar: #0f1e3a;
+    --bg-pane: #0f1e3a;
+    --text: #2c3040;
+    --text-dim: #7a809a;
+    --border: #e2e5ed;
+    --border-light: #eef0f5;
+    --good: #34b87a;
+    --mid: #e6b740;
+    --bad: #d87a7a;
+    --font: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* ------------------------------------------------------------------ topbar */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: var(--bg-topbar);
+    border-bottom: 1px solid #07111f;
+    flex-shrink: 0;
+}
+
+.brand {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+    text-transform: capitalize;
+}
+
+.topbar-right {
+    text-align: right;
+}
+
+.clock {
+    font-size: 18px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+}
+
+.refresh-info {
+    font-size: 11px;
+    color: #888;
+    margin-top: 2px;
+}
+
+.refresh-info.stale {
+    color: var(--bad);
+}
+
+/* ------------------------------------------------------------------ layout */
+.layout {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+/* ----------------------------------------------------------------- sidebar */
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--bg-pane);
+    border-right: 1px solid #07111f;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.sidebar-overview {
+    padding: 18px 18px 12px;
+    border-bottom: 1px solid #1a3060;
+}
+
+.overview-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 15px;
+}
+
+.overview-row .label { color: #aaa; }
+.overview-row .val { font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; }
+
+.gate-list {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #1a3060;
+}
+
+.gate-list-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #aaa;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.gate-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 3px 0;
+    color: #eee;
+}
+
+.gate-row .gate-time {
+    font-variant-numeric: tabular-nums;
+    color: #aaa;
+}
+
+/* sidebar nav */
+.sidebar-nav {
+    flex: 1;
+    padding: 12px 0;
+}
+
+.nav-group-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #777;
+    padding: 12px 18px 4px;
+    font-weight: 700;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    font-size: 15px;
+    color: #aaa;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+    background: #1a3060;
+    color: #fff;
+}
+
+.nav-item.active {
+    background: #1a3060;
+    color: #fff;
+    border-left-color: #fff;
+    font-weight: 700;
+}
+
+.nav-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #555;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.nav-item.active .nav-dot {
+    background: #fff;
+}
+
+/* -------------------------------------------------------------------- main */
+.main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    min-width: 0;
+    /* Smooth gradient bleed from dark-blue panes into the light-blue centre */
+    background:
+        linear-gradient(to right,  var(--bg-pane) 0%, transparent 2.5%, transparent 97.5%, var(--bg-pane) 100%),
+        linear-gradient(to bottom, var(--bg-topbar) 0%, transparent 2%),
+        var(--bg);
+}
+
+.grid-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+.grid-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+}
+
+.grid-svg-holder {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+}
+
+.grid-svg-holder svg {
+    height: calc(100vh - 180px);
+    width: auto;
+    max-width: 100%;
+}
+
+.loading, .error-box {
+    font-size: 18px;
+    color: var(--text-dim);
+}
+
+.error-box {
+    color: var(--bad);
+}
+
+/* --------------------------------------------------------------- right pane */
+.right-pane {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--bg-pane);
+    border-left: 1px solid #07111f;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-nav {
+    flex: 1;
+    padding: 12px 0;
+    overflow-y: auto;
+}
+
+/* legend sits inside .main, directly beside the grid */
+.legend-panel {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 8px;
+}
+
+.legend-title {
+    font-size: 13px;
+    color: #444;
+    font-weight: 700;
+    text-align: center;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    line-height: 1.3;
+    max-height: 120px;
+}
+
+.legend-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    font-variant-numeric: tabular-nums;
+}
+
+.legend-bar {
+    width: 14px;
+    height: 120px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--good), var(--mid), var(--bad));
+}
+
+/* -------------------------------------------------------------- SVG nodes */
+.q-circle {
+    transition: fill 0.4s ease, r 0.3s ease;
+}
+
+.q-value {
+    fill: var(--text);
+    font-size: 11px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font);
+    transition: opacity 0.3s;
+}
+
+.pair-edge {
+    stroke-linecap: round;
+    transition: stroke 0.4s ease, stroke-width 0.3s ease;
+}
+
+.edge-value {
+    fill: var(--text);
+    font-size: 10px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font);
+    transition: opacity 0.3s;
+}
+
+/* ---------------------------------------------------------------- progress */
+.progress {
+    height: 3px;
+    background: #07111f;
+    flex-shrink: 0;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #fff;
+    transition: width 0.2s linear;
+}
