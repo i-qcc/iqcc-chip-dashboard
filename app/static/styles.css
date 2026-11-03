@@ -341,16 +341,14 @@ body {
     transition: opacity 0.3s;
 }
 
-/* ---------------------------------------------------------------- progress */
-.progress {
-    height: 3px;
-    background: #07111f;
-    flex-shrink: 0;
-}
-
-.progress-bar {
-    height: 100%;
-    width: 0%;
-    background: #fff;
-    transition: width 0.2s linear;
+/* --------------------------------------------------------------- countdown */
+.countdown {
+    position: fixed;
+    right: 12px;
+    bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-dim);
+    opacity: 0.8;
 }

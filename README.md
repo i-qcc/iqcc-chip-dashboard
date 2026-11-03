@@ -24,7 +24,7 @@ every 10 minutes) and can display **multiple backends side-by-side**.
 - **Staleness rule:** metrics that carry a collection timestamp (1Q RB,
   2Q RB) are hidden when older than the staleness window (default 5 h). T1/T2\*/
   readout have no timestamp in state and are always shown.
-- Auto-rotating kiosk display with progress bar and view indicator dots
+- Auto-rotating kiosk display with a small countdown to the next view
 - Multiple backends → shown side-by-side on every screen
 
 ## Requirements

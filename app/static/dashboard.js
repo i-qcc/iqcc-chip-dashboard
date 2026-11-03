@@ -14,7 +14,7 @@ const rightNav = document.getElementById("right-nav");
 const mainEl = document.getElementById("main");
 const refreshInfoEl = document.getElementById("refresh-info");
 const clockEl = document.getElementById("clock");
-const progressBar = document.getElementById("progress-bar");
+const countdownEl = document.getElementById("countdown");
 
 let latest = null;
 let viewIndex = 0;
@@ -511,11 +511,12 @@ function restartRotation() {
 function restartProgress() {
     if (progressTimer) clearInterval(progressTimer);
     const start = Date.now();
-    progressBar.style.width = "0%";
-    progressTimer = setInterval(() => {
-        const pct = Math.min(100, ((Date.now() - start) / ROTATION_MS) * 100);
-        progressBar.style.width = pct + "%";
-    }, 200);
+    const render = () => {
+        const left = Math.max(0, ROTATION_MS - (Date.now() - start));
+        countdownEl.textContent = Math.ceil(left / 1000);
+    };
+    render();
+    progressTimer = setInterval(render, 200);
 }
 
 /* ------------------------------------------------------------------- data */
