@@ -242,8 +242,17 @@ body {
     min-height: 0;
 }
 
+.median-badge {
+    min-height: 22px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
 .grid-svg-holder svg {
-    height: calc(100vh - 180px);
+    height: calc(100vh - 210px);
     width: auto;
     max-width: 100%;
 }

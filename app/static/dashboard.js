@@ -428,6 +428,40 @@ function updateNavHighlight() {
     });
 }
 
+/* ------------------------------------------------------------------ median */
+function median(vals) {
+    const v = vals.filter(x => x != null).sort((a, b) => a - b);
+    if (!v.length) return null;
+    const m = Math.floor(v.length / 2);
+    return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+}
+
+/** Median over active qubits/pairs for the given view, or "" if not shown. */
+function medianText(viewId, backend) {
+    const aq = backend.qubits.filter(q => q.active);
+    const ap = backend.pairs.filter(p => p.active);
+    switch (viewId) {
+    case "t1": {
+        const m = median(aq.map(q => q.t1_us));
+        return `Median T1: ${m != null ? m.toFixed(1) + " \u00b5s" : "\u2014"}`;
+    }
+    case "t2star": {
+        const m = median(aq.map(q => q.t2star_us));
+        return `Median T2*: ${m != null ? m.toFixed(1) + " \u00b5s" : "\u2014"}`;
+    }
+    case "rb1q": {
+        const m = median(aq.map(q => metricValue(q.rb_1q_fidelity)));
+        return `Median 1Q fidelity: ${fmtPct(m, 2)}`;
+    }
+    case "rb2q": {
+        const m = median(ap.map(p => metricValue(p.rb_2q_fidelity)));
+        return `Median 2Q fidelity: ${fmtPct(m, 2)}`;
+    }
+    default:
+        return "";
+    }
+}
+
 /* -------------------------------------------------------------- grid state */
 let gridStates = [];  // one per backend
 
@@ -447,6 +481,8 @@ function rebuildGrids() {
         const holder = el("div", "grid-svg-holder");
         holder.appendChild(gs.svg);
         container.appendChild(holder);
+        gs.medianEl = el("div", "median-badge");
+        container.appendChild(gs.medianEl);
         gridRow.appendChild(container);
     });
 
@@ -477,6 +513,9 @@ function applyView() {
     latest.backends.forEach((backend, i) => {
         if (!gridStates[i]) return;
         updateGridOverlay(gridStates[i], backend, view);
+        const med = medianText(view.id, backend);
+        const prefix = latest.backends.length > 1 ? `${backend.backend}: ` : "";
+        gridStates[i].medianEl.textContent = med ? prefix + med : "";
     });
 
     // Update right-pane legend
