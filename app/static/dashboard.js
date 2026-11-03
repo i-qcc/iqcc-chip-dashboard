@@ -605,7 +605,20 @@ function tickClock() {
 }
 
 /* ------------------------------------------------------------------- init */
+async function requestWakeLock() {
+    if (!("wakeLock" in navigator)) return;
+    try {
+        await navigator.wakeLock.request("screen");
+    } catch (e) {
+        console.warn("wake lock unavailable", e);
+    }
+}
+
 function init() {
+    requestWakeLock();
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") requestWakeLock();
+    });
     tickClock();
     setInterval(tickClock, 1000);
     poll();

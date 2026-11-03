@@ -68,6 +68,7 @@ if not exist "%UV%" (
 
 call :update_code || goto :fail
 call :install_deps || goto :fail
+call :start_keep_awake
 
 :run
 call :stop_kiosk
@@ -129,6 +130,14 @@ echo Installing Python and dependencies (first run takes a few minutes)...
 "%UV%" sync --frozen --no-dev
 if errorlevel 1 "%UV%" sync --no-dev || exit /b 1
 if defined NEW_SHA (echo %NEW_SHA%)>"%SHA_FILE%"
+exit /b 0
+
+:start_keep_awake
+rem Run a copy outside APP_DIR so updates can replace APP_DIR while it runs.
+copy /y "%APP_DIR%\windows\keep_awake.ps1" "%INSTALL_DIR%\keep_awake.ps1" >nul || exit /b 0
+cd /d "%INSTALL_DIR%"
+start "" /b powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%INSTALL_DIR%\keep_awake.ps1"
+echo Keep-awake started (prevents sleep, screen-off and auto-lock).
 exit /b 0
 
 :start_server
