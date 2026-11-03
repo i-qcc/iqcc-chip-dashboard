@@ -44,7 +44,7 @@ class Settings:
     backends: list[str] = field(default_factory=lambda: ["arbel"])
     refresh_interval_seconds: int = 600
     staleness_hours: float = 5.0
-    rotation_seconds: int = 15
+    rotation_seconds: float = 10.5
     api_token: str | None = None
     cloud_url: str | None = None
 
@@ -60,7 +60,7 @@ class Settings:
             backends=backends,
             refresh_interval_seconds=int(os.environ.get("REFRESH_INTERVAL_SECONDS", "600")),
             staleness_hours=float(os.environ.get("STALENESS_HOURS", "5")),
-            rotation_seconds=int(os.environ.get("ROTATION_SECONDS", "15")),
+            rotation_seconds=float(os.environ.get("ROTATION_SECONDS", "10.5")),
             api_token=os.environ.get("IQCC_API_TOKEN") or None,
             cloud_url=os.environ.get("IQCC_CLOUD_URL") or None,
         )

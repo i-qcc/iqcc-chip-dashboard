@@ -2,13 +2,14 @@
 
 /* ------------------------------------------------------------------ config */
 const body = document.body;
-const ROTATION_MS = (parseInt(body.dataset.rotationSeconds, 10) || 15) * 1000;
+const ROTATION_MS = (parseFloat(body.dataset.rotationSeconds) || 10.5) * 1000;
 const POLL_MS = Math.max(
     15000,
     ((parseInt(body.dataset.refreshIntervalSeconds, 10) || 600) * 1000) / 4
 );
 
 const sidebarOverview = document.getElementById("sidebar-overview");
+const sidebarChips = document.getElementById("sidebar-chips");
 const rightNav = document.getElementById("right-nav");
 const mainEl = document.getElementById("main");
 const refreshInfoEl = document.getElementById("refresh-info");
@@ -28,7 +29,6 @@ const VIEWS = [
     { id: "gef",       group: "Readout",            title: "GEF Readout (g/e/f)",  mode: "qubit" },
     { id: "rb1q",      group: "Single-Qubit Gates", title: "1Q RB Fidelity",       mode: "qubit" },
     { id: "rb2q",      group: "Two-Qubit Gates",    title: "2Q RB Fidelity",       mode: "pair"  },
-    { id: "bell",      group: "Two-Qubit Gates",    title: "Bell State Fidelity",  mode: "pair"  },
 ];
 
 /* --------------------------------------------------------------- utilities */
@@ -99,6 +99,8 @@ const R_ACTIVE   = 24;
 const R_INACTIVE = 11;
 const SPACING    = 78;
 const PAD        = 44;
+// Horizontal edges are shorter than their label, so the label sits above the line.
+const HORIZONTAL_LABEL_LIFT = 11;
 
 function gridExtent(qubits) {
     let maxCol = 0, maxRow = 0;
@@ -156,8 +158,9 @@ function buildGrid(backend) {
         edgeEls[p.id] = line;
 
         // value label on edge (hidden initially)
+        const isHorizontal = Math.abs(a.cy - b.cy) < 1;
         const mx = (a.cx + b.cx) / 2;
-        const my = (a.cy + b.cy) / 2;
+        const my = (a.cy + b.cy) / 2 - (isHorizontal ? HORIZONTAL_LABEL_LIFT : 0);
         const bg = svgEl("rect", {
             x: mx - 22, y: my - 8, width: 44, height: 16, rx: 4,
             fill: "rgba(255,255,255,0.85)", opacity: 0,
@@ -250,11 +253,6 @@ function getPairAccessor(viewId) {
             const v = metricValue(p.rb_2q_fidelity);
             return { score: fidelityScore(v, 0.9), label: v != null ? fmtPct(v) : "" };
         };
-    case "bell":
-        return p => {
-            const v = metricValue(p.bell_fidelity);
-            return { score: fidelityScore(v, 0.8), label: v != null ? fmtPct(v) : "" };
-        };
     default:
         return () => ({ score: null, label: "" });
     }
@@ -282,14 +280,25 @@ function getLegendLabels(viewId, backend) {
         return { low: "98%", high: "100%" };
     case "rb2q":
         return { low: "90%", high: "100%" };
-    case "bell":
-        return { low: "80%", high: "100%" };
     default:
         return { low: "", high: "" };
     }
 }
 
 /* ------------------------------------------------- update overlay on grid */
+const LABEL_PAD_X = 2;
+const LABEL_PAD_Y = 1;
+
+function fitLabelBackground(bg, lbl) {
+    const bb = lbl.getBBox();
+    if (!bb.width) return;
+    bg.setAttribute("x", bb.x - LABEL_PAD_X);
+    bg.setAttribute("y", bb.y - LABEL_PAD_Y);
+    bg.setAttribute("width", bb.width + 2 * LABEL_PAD_X);
+    bg.setAttribute("height", bb.height + 2 * LABEL_PAD_Y);
+    bg.setAttribute("rx", 3);
+}
+
 function updateGridOverlay(gridState, backend, view) {
     const { circleEls, valueLabelEls, edgeEls, edgeLabelEls } = gridState;
     const isPairView = view.mode === "pair";
@@ -333,6 +342,7 @@ function updateGridOverlay(gridState, backend, view) {
                 lblEls.lbl.textContent = label;
                 lblEls.lbl.setAttribute("opacity", label ? 1 : 0);
                 lblEls.bg.setAttribute("opacity", label ? 1 : 0);
+                if (label) fitLabelBackground(lblEls.bg, lblEls.lbl);
             }
         } else {
             line.setAttribute("stroke", p.active ? "#111" : "#bbb");
@@ -361,7 +371,6 @@ function renderSidebar(backends) {
             ["Active qubits", b.n_active_qubits],
             ["Active pairs", b.n_active_pairs],
             ["Last calibration", fmtDateTime(b.last_calibration)],
-            ["Cluster", b.cluster_name || "\u2014"],
         ];
         rows.forEach(([label, val]) => {
             const row = el("div", "overview-row");
@@ -377,13 +386,26 @@ function renderSidebar(backends) {
             b.native_gates.forEach(g => {
                 const row = el("div", "gate-row");
                 row.appendChild(el("span", null, g.name));
-                row.appendChild(el("span", "gate-time", fmtNum(g.length_ns, "ns", 0)));
+                let time = fmtNum(g.length_ns, "ns", 0);
+                if (g.min_ns != null && g.max_ns != null && g.min_ns !== g.max_ns) {
+                    time += ` (${g.min_ns}\u2013${g.max_ns})`;
+                }
+                row.appendChild(el("span", "gate-time", time));
                 gateDiv.appendChild(row);
             });
             section.appendChild(gateDiv);
         }
 
         sidebarOverview.appendChild(section);
+    });
+
+    sidebarChips.innerHTML = "";
+    backends.forEach(b => {
+        if (!b.chip_image) return;
+        const img = el("img", "chip-photo");
+        img.src = b.chip_image;
+        img.alt = `${b.backend} chip`;
+        sidebarChips.appendChild(img);
     });
 
     // Nav in RIGHT pane

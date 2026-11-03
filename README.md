@@ -11,13 +11,17 @@ every 10 minutes) and can display **multiple backends side-by-side**.
 
 ## Features
 
-- Backend name, cluster, last calibration time
+- Backend name, last calibration time
+- Chip photo in the bottom-left corner when `app/static/chips/<backend>.jpg`
+  exists. Add one with
+  `uv run --no-project --with opencv-python-headless scripts/enhance_chip_image.py <photo> <backend>`,
+  which also boosts fine chip details. Raw photos are kept in `chip_photos/`.
 - QPU grid heatmaps: **T1**, **T2\***, **readout fidelity**, **GEF readout
   fidelity**, **1Q RB fidelity**
-- Pair graph: **2Q RB fidelity**, **Bell state fidelity**, CZ gate times
+- Pair graph: **2Q RB fidelity**, CZ gate times
 - Native gates and gate times
 - Active qubits / active qubit pairs
-- **Staleness rule:** metrics that carry a collection timestamp (1Q RB, Bell,
+- **Staleness rule:** metrics that carry a collection timestamp (1Q RB,
   2Q RB) are hidden when older than the staleness window (default 5 h). T1/T2\*/
   readout/GEF have no timestamp in state and are always shown.
 - Auto-rotating kiosk display with progress bar and view indicator dots
@@ -38,7 +42,7 @@ Copy `.env.example` to `.env` and adjust:
 | `BACKENDS` | `arbel` | Comma-separated backends. >1 → shown side-by-side. |
 | `REFRESH_INTERVAL_SECONDS` | `600` | How often to re-download state/wiring. |
 | `STALENESS_HOURS` | `5` | Hide timestamped metrics older than this. |
-| `ROTATION_SECONDS` | `15` | Dwell time per kiosk view. |
+| `ROTATION_SECONDS` | `10.5` | Dwell time per kiosk view. |
 | `IQCC_API_TOKEN_<BACKEND>` | _(unset)_ | Per-backend JWT token, e.g. `IQCC_API_TOKEN_ARBEL`. Tokens are backend-specific. |
 | `IQCC_API_TOKEN` | _(unset)_ | Fallback token for backends without their own. If neither is set, falls back to `~/.config/iqcc_cloud/config.toml`. |
 | `IQCC_CLOUD_URL` | _(unset)_ | Optional cloud URL override. |

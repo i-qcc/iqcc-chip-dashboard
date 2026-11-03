@@ -7,7 +7,7 @@ raw JSON into a compact, front-end-friendly structure. It also:
   gate lengths and the active CZ macro can be read;
 * computes readout / GEF readout fidelity from confusion matrices;
 * applies the staleness rule: metrics carrying a collection timestamp
-  (1Q RB, Bell state, 2Q RB) are hidden when older than ``staleness_hours``;
+  (1Q RB, 2Q RB) are hidden when older than ``staleness_hours``;
   metrics without a timestamp (T1, T2*, readout, GEF) are always shown.
 
 Coherence times are stored in seconds and reported in microseconds. Pulse
@@ -275,9 +275,6 @@ def _build_pair(
     fidelity = macro.get("fidelity", {}) if isinstance(macro, dict) else {}
 
     bell = fidelity.get("Bell_State", {}) or {}
-    bell_metric = _timestamped_metric(
-        bell.get("Fidelity"), bell.get("updated_at"), staleness_hours
-    )
     ts = parse_timestamp(bell.get("updated_at"))
     if ts:
         all_timestamps.append(ts)
@@ -303,7 +300,6 @@ def _build_pair(
         "control": control,
         "target": target,
         "cz_length_ns": cz_length,
-        "bell_fidelity": bell_metric,
         "rb_2q_fidelity": rb2q_metric,
     }
 
@@ -358,7 +354,14 @@ def _native_gates(state: dict, active_qubits: list[str]) -> list[dict]:
                 cz_lengths.append(int(flux["length"]))
     cz_lengths.sort()
     cz_median = cz_lengths[len(cz_lengths) // 2] if cz_lengths else None
-    result.append({"name": "CZ", "length_ns": cz_median})
+    result.append(
+        {
+            "name": "CZ",
+            "length_ns": cz_median,
+            "min_ns": cz_lengths[0] if cz_lengths else None,
+            "max_ns": cz_lengths[-1] if cz_lengths else None,
+        }
+    )
 
     return result
 

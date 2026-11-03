@@ -27,6 +27,16 @@ logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+CHIP_IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp")
+
+
+def _chip_image_url(backend: str) -> str | None:
+    """URL of ``static/chips/<backend>.<ext>`` if such a photo exists."""
+    for ext in CHIP_IMAGE_EXTENSIONS:
+        name = f"{backend.lower()}{ext}"
+        if (BASE_DIR / "static" / "chips" / name).is_file():
+            return f"/static/chips/{name}"
+    return None
 
 
 async def _refresh_backend(backend: str) -> None:
@@ -41,6 +51,7 @@ async def _refresh_backend(backend: str) -> None:
             staleness_hours=settings.staleness_hours,
             fetched_at=fetched_at,
         )
+        data["chip_image"] = _chip_image_url(datasets.backend)
         cache.set_backend(datasets.backend, data)
         logger.info(
             "Refreshed '%s': %d qubits, %d pairs",

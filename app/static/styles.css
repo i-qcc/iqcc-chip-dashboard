@@ -130,6 +130,21 @@ body {
     color: #aaa;
 }
 
+.sidebar-chips {
+    margin-top: auto;
+    padding: 12px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chip-photo {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
 /* sidebar nav */
 .sidebar-nav {
     flex: 1;
