@@ -441,6 +441,11 @@ function medianText(viewId, backend) {
     const aq = backend.qubits.filter(q => q.active);
     const ap = backend.pairs.filter(p => p.active);
     switch (viewId) {
+    case "readout": {
+        const m00 = median(aq.map(q => q.readout_f00));
+        const m11 = median(aq.map(q => q.readout_f11));
+        return `Median readout: F\u2080\u2080\u202f${fmtPct(m00)}\u2002|\u2002F\u2081\u2081\u202f${fmtPct(m11)}`;
+    }
     case "t1": {
         const m = median(aq.map(q => q.t1_us));
         return `Median T1: ${m != null ? m.toFixed(1) + " \u00b5s" : "\u2014"}`;

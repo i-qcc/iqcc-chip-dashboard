@@ -134,6 +134,16 @@ def _to_us(seconds: Any) -> Optional[float]:
     return round(seconds * 1e6, 2)
 
 
+def _matrix_diag_elem(matrix: Any, i: int) -> Optional[float]:
+    """Return the i-th diagonal element of a confusion matrix."""
+    if not isinstance(matrix, list) or len(matrix) <= i:
+        return None
+    try:
+        return round(float(matrix[i][i]), 4)
+    except (IndexError, TypeError, ValueError):
+        return None
+
+
 def _diagonal_fidelity(matrix: Any) -> Optional[float]:
     """Average of the diagonal of a (square) confusion matrix, as a fraction."""
     if not isinstance(matrix, list) or not matrix:
@@ -252,6 +262,8 @@ def _build_qubit(
         "t2star_us": _to_us(q.get("T2ramsey")),
         "t2echo_us": _to_us(q.get("T2echo")),
         "readout_fidelity": _diagonal_fidelity(resonator.get("confusion_matrix")),
+        "readout_f00": _matrix_diag_elem(resonator.get("confusion_matrix"), 0),
+        "readout_f11": _matrix_diag_elem(resonator.get("confusion_matrix"), 1),
         "gef_readout_fidelity": _diagonal_fidelity(
             resonator.get("gef_confusion_matrix")
         ),
