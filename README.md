@@ -16,14 +16,14 @@ every 10 minutes) and can display **multiple backends side-by-side**.
   exists. Add one with
   `uv run --no-project --with opencv-python-headless scripts/enhance_chip_image.py <photo> <backend>`,
   which also boosts fine chip details. Raw photos are kept in `chip_photos/`.
-- QPU grid heatmaps: **T1**, **T2\***, **readout fidelity**, **GEF readout
-  fidelity**, **1Q RB fidelity**
+- QPU grid heatmaps: **T1**, **T2\***, **readout fidelity**, **1Q RB
+  fidelity**
 - Pair graph: **2Q RB fidelity**, CZ gate times
 - Native gates and gate times
 - Active qubits / active qubit pairs
 - **Staleness rule:** metrics that carry a collection timestamp (1Q RB,
   2Q RB) are hidden when older than the staleness window (default 5 h). T1/T2\*/
-  readout/GEF have no timestamp in state and are always shown.
+  readout have no timestamp in state and are always shown.
 - Auto-rotating kiosk display with progress bar and view indicator dots
 - Multiple backends → shown side-by-side on every screen
 

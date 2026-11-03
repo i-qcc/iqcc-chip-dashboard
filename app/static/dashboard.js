@@ -26,7 +26,6 @@ const VIEWS = [
     { id: "t1",        group: "Coherence",          title: "T1",                   mode: "qubit" },
     { id: "t2star",    group: "Coherence",          title: "T2*",                  mode: "qubit" },
     { id: "readout",   group: "Readout",            title: "Readout (g/e)",        mode: "qubit" },
-    { id: "gef",       group: "Readout",            title: "GEF Readout (g/e/f)",  mode: "qubit" },
     { id: "rb1q",      group: "Single-Qubit Gates", title: "1Q RB Fidelity",       mode: "qubit" },
     { id: "rb2q",      group: "Two-Qubit Gates",    title: "2Q RB Fidelity",       mode: "pair"  },
 ];
@@ -227,11 +226,6 @@ function getQubitAccessor(viewId, backend) {
             score: fidelityScore(q.readout_fidelity, 0.8),
             label: q.readout_fidelity != null ? fmtPct(q.readout_fidelity) : "",
         });
-    case "gef":
-        return q => ({
-            score: fidelityScore(q.gef_readout_fidelity, 0.8),
-            label: q.gef_readout_fidelity != null ? fmtPct(q.gef_readout_fidelity) : "",
-        });
     case "rb1q": {
         return q => {
             const v = metricValue(q.rb_1q_fidelity);
@@ -273,8 +267,6 @@ function getLegendLabels(viewId, backend) {
         return { low: "0 \u00b5s", high: `${Math.round(mx)} \u00b5s` };
     }
     case "readout":
-        return { low: "80%", high: "100%" };
-    case "gef":
         return { low: "80%", high: "100%" };
     case "rb1q":
         return { low: "98%", high: "100%" };
