@@ -39,7 +39,8 @@ Copy `.env.example` to `.env` and adjust:
 | `REFRESH_INTERVAL_SECONDS` | `600` | How often to re-download state/wiring. |
 | `STALENESS_HOURS` | `5` | Hide timestamped metrics older than this. |
 | `ROTATION_SECONDS` | `15` | Dwell time per kiosk view. |
-| `IQCC_API_TOKEN` | _(unset)_ | JWT token. If unset, falls back to `~/.config/iqcc_cloud/config.toml`. |
+| `IQCC_API_TOKEN_<BACKEND>` | _(unset)_ | Per-backend JWT token, e.g. `IQCC_API_TOKEN_ARBEL`. Tokens are backend-specific. |
+| `IQCC_API_TOKEN` | _(unset)_ | Fallback token for backends without their own. If neither is set, falls back to `~/.config/iqcc_cloud/config.toml`. |
 | `IQCC_CLOUD_URL` | _(unset)_ | Optional cloud URL override. |
 
 ### Providing the token

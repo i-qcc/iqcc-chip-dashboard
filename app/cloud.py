@@ -43,8 +43,9 @@ def fetch_backend_datasets(backend: str) -> BackendDatasets:
             decide how to surface it in the dashboard.
     """
     kwargs: dict[str, Any] = {"quantum_computer_backend": backend}
-    if settings.api_token:
-        kwargs["api_token"] = settings.api_token
+    api_token = settings.token_for(backend)
+    if api_token:
+        kwargs["api_token"] = api_token
     if settings.cloud_url:
         kwargs["url"] = settings.cloud_url
 

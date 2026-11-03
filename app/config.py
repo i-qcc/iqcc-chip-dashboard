@@ -48,6 +48,10 @@ class Settings:
     api_token: str | None = None
     cloud_url: str | None = None
 
+    def token_for(self, backend: str) -> str | None:
+        """Return ``IQCC_API_TOKEN_<BACKEND>`` if set, else ``IQCC_API_TOKEN``."""
+        return os.environ.get(f"IQCC_API_TOKEN_{backend.upper()}") or self.api_token
+
     @classmethod
     def from_env(cls) -> "Settings":
         _load_dotenv()
