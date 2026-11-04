@@ -39,7 +39,7 @@ Copy `.env.example` to `.env` and adjust:
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `BACKENDS` | `arbel` | Comma-separated backends. >1 → shown side-by-side. |
+| `BACKENDS` | `arbel` | Comma-separated backends. >1 → shown side-by-side. Leave unset on a kiosk to use `DEFAULT_BACKENDS` from `app/config.py` so a push to `main` can roll out a new default to every kiosk via the launcher's auto-update, with no per-machine edits. |
 | `REFRESH_INTERVAL_SECONDS` | `600` | How often to re-download state/wiring. |
 | `FETCH_TIMEOUT_SECONDS` | `90` | Max time to wait for one backend's cloud fetch before giving up and retrying next cycle; prevents a stuck/dead network call from freezing updates indefinitely. |
 | `STALENESS_HOURS` | `5` | Hide timestamped metrics older than this. |

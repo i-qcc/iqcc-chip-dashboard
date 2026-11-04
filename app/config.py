@@ -37,6 +37,16 @@ def _parse_backends(raw: str) -> list[str]:
     return [item.strip() for item in raw.split(",") if item.strip()]
 
 
+# Default backend list when no ``BACKENDS`` env var is set. This is the
+# "GitHub-side" default: the Windows kiosk launcher (windows/run_dashboard.bat)
+# auto-updates its code from this repo's `main` branch and restarts, so
+# changing this value and pushing to `main` rolls out to every kiosk that
+# doesn't set BACKENDS locally in its dashboard.env - no per-machine edits
+# needed. Per-backend API tokens still must stay local (dashboard.env),
+# never committed here.
+DEFAULT_BACKENDS = "arbel"
+
+
 @dataclass(frozen=True)
 class Settings:
     """Resolved application settings."""
@@ -56,7 +66,9 @@ class Settings:
     @classmethod
     def from_env(cls) -> "Settings":
         _load_dotenv()
-        backends = _parse_backends(os.environ.get("BACKENDS", "arbel")) or ["arbel"]
+        backends = _parse_backends(os.environ.get("BACKENDS", DEFAULT_BACKENDS)) or [
+            DEFAULT_BACKENDS
+        ]
         return cls(
             backends=backends,
             refresh_interval_seconds=int(os.environ.get("REFRESH_INTERVAL_SECONDS", "600")),
