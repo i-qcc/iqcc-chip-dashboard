@@ -43,6 +43,7 @@ class Settings:
 
     backends: list[str] = field(default_factory=lambda: ["arbel"])
     refresh_interval_seconds: int = 600
+    fetch_timeout_seconds: float = 90.0
     staleness_hours: float = 5.0
     rotation_seconds: float = 10.5
     api_token: str | None = None
@@ -59,6 +60,7 @@ class Settings:
         return cls(
             backends=backends,
             refresh_interval_seconds=int(os.environ.get("REFRESH_INTERVAL_SECONDS", "600")),
+            fetch_timeout_seconds=float(os.environ.get("FETCH_TIMEOUT_SECONDS", "90")),
             staleness_hours=float(os.environ.get("STALENESS_HOURS", "5")),
             rotation_seconds=float(os.environ.get("ROTATION_SECONDS", "10.5")),
             api_token=os.environ.get("IQCC_API_TOKEN") or None,

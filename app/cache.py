@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import threading
+from datetime import datetime
 from typing import Any, Optional
 
 
@@ -14,11 +15,21 @@ class DashboardCache:
         self._backends: dict[str, dict[str, Any]] = {}
         self._errors: dict[str, str] = {}
         self._last_refresh: Optional[str] = None
+        self._last_refresh_per_backend: dict[str, datetime] = {}
 
     def set_backend(self, backend: str, data: dict[str, Any]) -> None:
         with self._lock:
             self._backends[backend] = data
             self._errors.pop(backend, None)
+
+    def set_backend_refreshed(self, backend: str, iso_timestamp: str) -> None:
+        """Record when ``backend`` last *successfully* refreshed (for the watchdog)."""
+        with self._lock:
+            self._last_refresh_per_backend[backend] = datetime.fromisoformat(iso_timestamp)
+
+    def last_refresh_per_backend(self) -> dict[str, datetime]:
+        with self._lock:
+            return dict(self._last_refresh_per_backend)
 
     def set_error(self, backend: str, message: str) -> None:
         with self._lock:

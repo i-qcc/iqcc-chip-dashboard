@@ -48,9 +48,16 @@ rem Chaining (no "call") hands control to the installed copy for good.
 :installed
 set "ENV_FILE=%INSTALL_DIR%\dashboard.env"
 set "UPDATE_CHECK_SECONDS=3600"
+set "REFRESH_INTERVAL_SECONDS=600"
 for /f "usebackq eol=# tokens=1,* delims==" %%a in ("%ENV_FILE%") do (
     if /i "%%a"=="UPDATE_CHECK_SECONDS" set "UPDATE_CHECK_SECONDS=%%b"
+    if /i "%%a"=="REFRESH_INTERVAL_SECONDS" set "REFRESH_INTERVAL_SECONDS=%%b"
 )
+rem Allow the data to be a few refresh cycles late (slow network, retry,
+rem etc.) before we conclude the server is stuck and force-restart it.
+set /a "STALE_SECONDS=REFRESH_INTERVAL_SECONDS*4"
+if %STALE_SECONDS% LSS 900 set "STALE_SECONDS=900"
+set "HEALTH_CHECK_SECONDS=180"
 
 cd /d "%INSTALL_DIR%" || goto :fail
 
@@ -77,10 +84,30 @@ call :start_server
 call :open_kiosk
 echo.
 echo Dashboard running on http://127.0.0.1:%PORT%  (exit full screen with Alt+F4).
-echo Checking for updates every %UPDATE_CHECK_SECONDS% s. Close this window to stop.
+echo Checking health every %HEALTH_CHECK_SECONDS% s and for updates every %UPDATE_CHECK_SECONDS% s.
+echo Close this window to stop.
+set "SINCE_UPDATE_CHECK=0"
 
 :watch
-timeout /t %UPDATE_CHECK_SECONDS% /nobreak >nul
+timeout /t %HEALTH_CHECK_SECONDS% /nobreak >nul
+
+rem Health/staleness watchdog: if the server is unresponsive, or its cloud
+rem data hasn't refreshed in a while (e.g. a stuck network call on the
+rem server side - see app/main.py's per-backend fetch timeout for the
+rem primary fix), restart the server. This is the safety net for anything
+rem that fix doesn't catch, so an unattended kiosk laptop can't silently
+rem show stale numbers for hours.
+call :check_health
+if errorlevel 1 (
+    echo.
+    echo [%date% %time%] Dashboard unresponsive or data stale ^(^>%STALE_SECONDS%s^), restarting...
+    goto :run
+)
+
+set /a "SINCE_UPDATE_CHECK+=HEALTH_CHECK_SECONDS"
+if %SINCE_UPDATE_CHECK% LSS %UPDATE_CHECK_SECONDS% goto :watch
+set "SINCE_UPDATE_CHECK=0"
+
 call :remote_sha
 if not defined REMOTE_SHA goto :watch
 set "LOCAL_SHA="
@@ -93,6 +120,16 @@ call :stop_server
 call :update_code
 call :install_deps
 goto :run
+
+
+rem ---------------------------------------------------------------------------
+rem Returns errorlevel 0 if /healthz responds AND (no data yet, i.e. still on
+rem its first fetch after a fresh start, OR /api/data's last_refresh is newer
+rem than STALE_SECONDS). Returns errorlevel 1 (triggers a restart) otherwise,
+rem i.e. the server is unresponsive or data has gone genuinely stale.
+:check_health
+powershell -NoProfile -Command "try { Invoke-WebRequest -UseBasicParsing -TimeoutSec 5 'http://127.0.0.1:%PORT%/healthz' | Out-Null; $r = Invoke-RestMethod -UseBasicParsing -TimeoutSec 5 'http://127.0.0.1:%PORT%/api/data'; if (-not $r.last_refresh) { exit 0 }; $age = ((Get-Date).ToUniversalTime() - [DateTime]::Parse($r.last_refresh).ToUniversalTime()).TotalSeconds; if ($age -gt %STALE_SECONDS%) { exit 1 } else { exit 0 } } catch { exit 1 }"
+exit /b %errorlevel%
 
 
 rem ---------------------------------------------------------------------------

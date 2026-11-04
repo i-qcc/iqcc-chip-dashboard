@@ -41,6 +41,7 @@ Copy `.env.example` to `.env` and adjust:
 |---|---|---|
 | `BACKENDS` | `arbel` | Comma-separated backends. >1 → shown side-by-side. |
 | `REFRESH_INTERVAL_SECONDS` | `600` | How often to re-download state/wiring. |
+| `FETCH_TIMEOUT_SECONDS` | `90` | Max time to wait for one backend's cloud fetch before giving up and retrying next cycle; prevents a stuck/dead network call from freezing updates indefinitely. |
 | `STALENESS_HOURS` | `5` | Hide timestamped metrics older than this. |
 | `ROTATION_SECONDS` | `10.5` | Dwell time per kiosk view. |
 | `IQCC_API_TOKEN_<BACKEND>` | _(unset)_ | Per-backend JWT token, e.g. `IQCC_API_TOKEN_ARBEL`. Tokens are backend-specific. |
