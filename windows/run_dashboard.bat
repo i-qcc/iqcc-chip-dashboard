@@ -8,7 +8,8 @@ rem  no admin rights needed). Keep "dashboard.env" next to this file.
 rem
 rem  On first run it copies itself + dashboard.env to %LOCALAPPDATA% and runs
 rem  from there, so the USB stick can be removed afterwards. It then checks
-rem  GitHub every UPDATE_CHECK_SECONDS and restarts on a new version.
+rem  server health and GitHub every UPDATE_CHECK_SECONDS; restarts on a new
+rem  version or if data goes stale.
 rem  Closing this window stops the dashboard server.
 rem ---------------------------------------------------------------------------
 
@@ -47,7 +48,7 @@ rem Chaining (no "call") hands control to the installed copy for good.
 
 :installed
 set "ENV_FILE=%INSTALL_DIR%\dashboard.env"
-set "UPDATE_CHECK_SECONDS=3600"
+set "UPDATE_CHECK_SECONDS=600"
 set "REFRESH_INTERVAL_SECONDS=600"
 for /f "usebackq eol=# tokens=1,* delims==" %%a in ("%ENV_FILE%") do (
     if /i "%%a"=="UPDATE_CHECK_SECONDS" set "UPDATE_CHECK_SECONDS=%%b"
@@ -57,7 +58,8 @@ rem Allow the data to be a few refresh cycles late (slow network, retry,
 rem etc.) before we conclude the server is stuck and force-restart it.
 set /a "STALE_SECONDS=REFRESH_INTERVAL_SECONDS*4"
 if %STALE_SECONDS% LSS 900 set "STALE_SECONDS=900"
-set "HEALTH_CHECK_SECONDS=180"
+rem Health check and GitHub-update check both run on the same 10-min cycle.
+set "HEALTH_CHECK_SECONDS=600"
 
 cd /d "%INSTALL_DIR%" || goto :fail
 
